@@ -9,13 +9,13 @@ Iz = 0.5 * mass * R^2;
 Ix = 0.25 * mass * R^2 + (1/12) * mass * H^2; 
 Iy = 0.25 * mass * R^2 + (1/12) * mass * H^2; 
 
-Thr = 445; % N (thrust exerted by main thruster) 
+Thr = 490; % N (thrust exerted by main thruster) 
 
 offset = deg2rad(0.3); % deg (angle by which the center of mass is offset)
 
-delta_theta = deg2rad(1); 
+delta_theta = deg2rad(5); 
 
-total_time = 30 * 60; % seconds (total time of the burn)
+total_time = 23.74 * 60; % seconds (total time of the burn)
 %% Calculating initial estimate of spin velocity
 Thrz = Thr * cos(offset); 
 Thry = Thr * sin(offset); 
@@ -26,9 +26,9 @@ omega_z = (T_x  * total_time)/ (Iz * delta_theta);
 
 
 %% Differential Solver
-omega_z = 7.33; 
+omega_z = 8.5; 
 omega_0 = [0; 0; omega_z];
-time = linspace(0, 30*60, 200);
+time = linspace(0, total_time, 200);
 [t, w] = ode45(@vdp2, time, omega_0, [], Ix, Iy, Iz, T_x);
 figure(1)
 plot(t,w(:,3))
@@ -51,7 +51,7 @@ psi = [0];
 
 K = length(w); 
 for i = 1:K
- t_const = (30*60)/K;
+ t_const = total_time/K;
  curr_time = linspace((i-1)*t_const, i*t_const, 10);
  init_cond = [psi(end), theta(end), phi(end)];
 
@@ -66,30 +66,50 @@ for i = 1:K
  disp(i)
 end
 
-%%
-% initial conditions, empty set, other arguments
+%% taking modulo
+phi = mod(phi, 2*pi); 
+theta = mod(theta, 2*pi); 
+psi = mod(psi, 2*pi); 
+
+
+%% switching values close to 360 degrees
+for i = 1:length(psi)
+     if psi(i) > pi
+         psi(i) = psi(i) - 2*pi; 
+     end
+     if theta(i) > pi
+         theta(i) = theta(i) - 2*pi; 
+     end
+     if phi(i) > pi
+         phi(i) = phi(i) - 2*pi; 
+     end
+    
+end
+
+%% plotting
+
 figure(3)
-plot(broad_time,mod(psi,(2*pi)));
+plot(broad_time,rad2deg(psi));
 title('Euler Angle: \psi');
 xlabel('Time t (seconds)');
-ylabel('\psi (rad)');
+ylabel('\psi (deg)');
 
 figure(4)
-plot(broad_time,mod(theta,(2*pi)));
+plot(broad_time,rad2deg(theta));
 title('Euler Angle: \theta');
 xlabel('Time t (seconds)');
-ylabel('\theta (rad)');
+ylabel('\theta (deg)');
 
 figure(5)
-plot(broad_time,mod(phi,(2*pi)));
+plot(broad_time,rad2deg(phi));
 title('Euler Angle: \phi');
 xlabel('Time t (seconds)');
-ylabel('\phi (rad)');
+ylabel('\phi (deg)');
 
 
 %% Actuator Sizing
-t = 0.021; %seconds
-T = 1.12 * R; %SI Units of torque
+t = 0.02; %seconds
+T = 105 * 4 * R; %SI Units of torque
 
 num_needed = sqrt((Iz * omega_z)/(t * T));
 
@@ -103,7 +123,7 @@ function dwdt = vdp2(t, w, Ix, Iy, Iz, T_x)
 I1 = Ix;
 I2 = Iy;
 I3 = Iz;
-dwdt = [(-1 * (I3 - I2) * w(2) * w(3))/I1 + T_x; (-1*(I1 - I3)*w(3)*w(1))/I2; 0];
+dwdt = [(-1 * (I3 - I2) * w(2) * w(3) + T_x)/I1; (-1*(I1 - I3)*w(3)*w(1))/I2; 0];
 end
 function dydt = vdp3(t, y, omega)
 dydt = [omega(2) * (sin(y(3))/cos(y(2))) + omega(3) * (cos(y(3))/cos(y(2))); omega(2) * cos(y(3)) - omega(3) * sin(y(3)); omega(1) + omega(2) * (sin(y(3)) * tan(y(2))) + omega(3) * (cos(y(3)) * tan(y(2)))];

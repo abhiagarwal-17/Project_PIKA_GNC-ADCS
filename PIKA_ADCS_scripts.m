@@ -70,15 +70,31 @@
     
 %% Testing functions/Examples
 
-TS = SRP(1.4,0.9,0,0,0,0); %spacecraft with r =1.4m and h = 0.9 m and defaulted values otherwise
+TS = SRP(1.57/2,1.524,0,0,0,0); %spacecraft with r =1.57/2 m and h = 1.524 m and defaulted values otherwise
 
-TG = Grav(0,0,-1,1.4,0.9,70); %same dimensions as above and mass = 70 kg
+%TG = Grav(0,0,-1,1.57/2,1.524,600); %same dimensions as above and mass = 600 kg
+
+I = paxis(1.57/2,1.524,2*(1.524),(1/2)*1.524,600,20); %assuming the panels are 10 kg in weight, Lplate = 2hcyl, 
+%hplate = 1/2hycl
+
+TG = pGrav(0,0,-1,1.57/2,1.524,600,I(1),I(2),I(3)); %new TG calc with parallel axis therorem
 
 Tc = Control(TG,0); %uses the primary disturbance torque in this example, which is gravity gradient torque
 
 h = Moment(TG,0); %finds an estimate of the maximum reaction wheel saturation
 
+slw = Slew(180,500,300); %slew torque of 180 degrees around the maximum moment of inertia in 5 minutes (300 s)
 
+slwchng = slw*(300/2); %change in momentum due to slew torque in [Nms]
+
+%For thrusters:
+
+%pulse duration 0.025
+%1.1 Nm [max for 1 pulse]
+%assume 10 ms down time
+
+%Worst case scenario slew will likely require thrusters but some lesser
+%slews can be completed with RWs --> saves on propellant/fuel
 
 %% functions start here
 
@@ -123,7 +139,7 @@ Ts = (phi/c)*As*(1+q)*(dc)*cos(psi);
 end
 
 
-%gravity gradient disturbance torque
+%gravity gradient disturbance torque --> non-parallel axis thm
 function Tg = Grav(mu,R,theta,r,h,m)
 
 rm = 1738*10^3;
@@ -146,8 +162,8 @@ if theta == -1
     theta = 10;
 end
 
-Iz = 0.5*m*r^2; 
-Iy = (1/12)*m*(3*r^2 + h^2);
+Iz = 0.5*m*r^2
+Iy = ((1/12)*m*(3*r^2 + h^2))
 
 Tg = ((3*mu)/(2*R^3))*abs(Iz - Iy)*sind(2*theta);
 
@@ -176,7 +192,7 @@ end
 function h = Moment(Td,P)
 
 if P == 0
-    P = 2*3600
+    P = 2*3600;
 end
 
 %rms average of sinusoidal function divided by 4 (assume max saturation 1/4 way
@@ -186,7 +202,56 @@ c = 0.707/4;
 h = Td*P*c;
 end
 
+function I = paxis(rcyl,hcyl,Lplate,hplate,mcyl,mplate)
+
+Apl = Lplate*hplate;
+Acyl = 2*pi*rcyl*hcyl + 2*pi*rcyl^2;
+
+Iplx = (1/12)*mplate*(0^2 + hplate^2);
+Iply = (1/12)*mplate*(0^2 + Lplate^2);
+Iplz = (1/12)*mplate*(hplate^2 + Lplate^2);
+
+Icylx = ((1/12)*mcyl*(3*rcyl^2 + hcyl^2));
+Icyly = Icylx;
+Icylz = (1/2)*mcyl*rcyl^2;
+
+Ix = Iplx + Icylx
+
+Iy = Iply + Apl*(Lplate/2 + rcyl) + Icyly
+
+Iz = Ix + Iy
+
+I = [Ix Iy Iz];
+end
 
 
+%gravity gradient disturbance torque --> parallel axis thm
+function Tg = pGrav(mu,R,theta,r,h,m,Ix,Iy,Iz)
+I = [Ix Iy Iz]
+
+
+rm = 1738*10^3;
+
+%Gravitational parameter --> defaults to mu for the moon
+if mu == 0
+    mu = 4.905*10^12;
+end
+
+%distance from the center of the orbiting body --> default assumes the
+%orbiting body is the moon with an orbital altitude of 100 km
+if R == 0
+    R = 100*10^3 + rm;
+end
+
+%angle between local vertical and Z principal axis --> assuming a larger
+%difference between geometric and principal axes to accomodate weight
+%distrubution imbalances due to tertary payloads, ESPA ring, etc..
+if theta == -1
+    theta = 10;
+end
+
+Tg = ((3*mu)/(2*R^3))*abs(max(I) - min(I))*sind(2*theta);
+
+end
 
 

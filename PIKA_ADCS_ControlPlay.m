@@ -139,7 +139,6 @@ T = I^-1*K2*(Anew*x + B*K2*x(:,:));
 
 %% Dynamical Modelling and State Space Realizations for the ADCS/GNC Subsystem 
 
-
 close all 
 clear vars
 
@@ -149,9 +148,11 @@ Iy = 229.4092;
 Iz = 438.9395;
 
 %initial error [rad/s] --> 1 degree error deviation 
-wx0 = 0.05;
-wy0 = 0.05;
-wz0 = 0.05;
+wx0 =    0.0017;
+wy0 =    0.0017;
+wz0 =    0.0017;
+
+%5000 for 0.0017 rad/s
 thex0 = 0.0873;
 they0 = 0.0873;
 thez0 = 0.0873;
@@ -176,28 +177,28 @@ Cn = [ones(1,3) ones(1,3)];
 
 
 %use the lqr method to stabilize the system 
-M = 10; 
+M = 100; 
 Q1 = Cn.'*M*Cn;
-R = 100;
+R = 10;
 K2 = lqr(An,Bn,Q1,R);
 
 
 %Discrete simulation of the open loop system
 
 %timesteps
-T = 10000;
+T = 6000;
 %state vector and initial conditions
 x = zeros(6,T);
 x(:,1) = [wx0;wy0;wz0;thex0;they0;they0];
 t = 0.002;
 
-for i = 1:10000
+for i = 1:6000
     u = 0;
-    w = randn(6,1);
+    w = randn(6,1).*10^-2;
     x(:,i+1) = x(:,i) + t*(An*x(:,i) + w);
 end
 
-T = linspace(1,10000,10001);
+T = linspace(1,6000,6001);
 figure()
 plot(T,x(4,:),T,x(5,:),T,x(6,:));
 title('Open Loop Dynamics');
@@ -206,13 +207,13 @@ xlabel('Timesteps');
 ylabel('Angle Error (rad)');
 
 %Discrete simulation of closed loop system
-T = 10000;
+T = 6000;
 x = zeros(6,T);
 x(:,1) = [wx0;wy0;wz0;thex0;they0;they0];
 t = 0.002;
 
 %Stability envelope of +/- 0.1 degrees
-for i = 1:10000
+for i = 1:6000
     if x(1:3,i) >= 0.00174533 | x(1:3,i) <= -0.00174533
         Kcl = K2;
     elseif x(1:3,i) <= (0.00174533)/2 & x(1:3,i) <= -(0.00174533)/2
@@ -221,15 +222,15 @@ for i = 1:10000
     
     Anew = An - Bn*K2;
     u = -Kcl*x(:,i);
-    w = randn(6,1)*10^-5;
+    w = randn(6,1).*10^-2;
     x(:,i+1) = x(:,i) + t*(Anew*x(:,i) + Bn*u + w);
 end
 
-T = linspace(1,10000,10001);
+T = linspace(1,6000,6001);
 figure()
 plot(T,x(4,:),T,x(5,:),T,x(6,:));
-yline(0.0174533,'r:');
-yline(-0.0174533,'r:');
+yline(0.00174533,'r:');
+yline(-0.00174533,'r:');
 legend('\theta_1','\theta_2','\theta_3','location','northeastoutside');
 title('Closed Loop Dynamics');
 xlabel('Timesteps');
@@ -246,3 +247,9 @@ Tmean = mean(T,'all');
 
 %for the future: solve non-linear equations with linear controller to
 %validate controller in the non-linear regime
+
+h = Tmean*4.734e+7;
+
+%Number of saturations in 1.5 years
+timesat = h/4;
+

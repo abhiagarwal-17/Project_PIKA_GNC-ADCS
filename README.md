@@ -7,4 +7,4 @@ Use `PIKA_Actuator.m` to solve coupled differential equations and find the Euler
 
 Use `PIKA_Stationkeeping.m` to estimate delta v values in low lunar orbit for stationkeeping. 
 
-Use 'PIKA_ADCS_ControlPlay.m' to simulate open-loop (uncontrolled) and closed-loop (LQR) dynamical models for the on-orbit spacecraft.
+Use `PIKA_ADCS_ControlPlay.m` to simulate open-loop (uncontrolled) and closed-loop (LQR) dynamical models for the on-orbit spacecraft.

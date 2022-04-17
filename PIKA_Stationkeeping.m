@@ -55,3 +55,27 @@ total_c2 = abs(dv1_c2) + abs(dv2_c2);
 
 total_c2 = (365/frequency) * total_c2; 
 
+
+%% Thruster Pulse Calculations
+clc; 
+clear; 
+small_thrust = 52; %N
+large_thrust = 105; %N
+t = 20/1000; %seconds
+
+% for the axis direction: 
+T_total = 4 * 52 * sin(deg2rad(47.22)) * (1.575/2); 
+
+impulse = T_total * t; 
+
+num = 4/impulse; 
+
+annual_num = num * 1000; 
+
+
+% for other directions
+T_total_perp = 2 * 105 * (1.575/2); 
+impulse_perp = T_total_perp * t; 
+num_perp = 4/impulse_perp; 
+
+annual_num_perp = num_perp * 1000; 

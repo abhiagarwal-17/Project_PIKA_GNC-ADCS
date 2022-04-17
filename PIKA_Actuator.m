@@ -13,7 +13,7 @@ Thr = 490; % N (thrust exerted by main thruster)
 
 offset = deg2rad(0.3); % deg (angle by which the center of mass is offset)
 
-delta_theta = deg2rad(5); 
+delta_theta = deg2rad(1); 
 
 total_time = 23.74 * 60; % seconds (total time of the burn)
 %% Calculating initial estimate of spin velocity
@@ -26,7 +26,7 @@ omega_z = (T_x  * total_time)/ (Iz * delta_theta);
 
 
 %% Differential Solver
-omega_z = 8.5; 
+omega_z = 8.1; 
 omega_0 = [0; 0; omega_z];
 time = linspace(0, total_time, 200);
 [t, w] = ode45(@vdp2, time, omega_0, [], Ix, Iy, Iz, T_x);
@@ -41,7 +41,7 @@ plot(t, w(:,1),t,w(:,2));
 title('\omega v/s t');
 xlabel('Time t (seconds)');
 ylabel('\omega (rad/s)');
-legend('w(1)','w(2)');
+legend('w_1','w_2');
 
 %%
 broad_time = [0];
@@ -90,7 +90,7 @@ end
 
 figure(3)
 plot(broad_time,rad2deg(psi));
-title('Euler Angle: \psi');
+title('Euler Angle: \psi');     
 xlabel('Time t (seconds)');
 ylabel('\psi (deg)');
 
@@ -109,10 +109,12 @@ ylabel('\phi (deg)');
 
 %% Actuator Sizing
 t = 0.02; %seconds
-T = 105 * 4 * R; %SI Units of torque
+
+T = 4 * 52 * sin(deg2rad(47.22)) * (1.575/2); 
 
 num_needed = sqrt((Iz * omega_z)/(t * T));
 
+time_needed = num_needed * 10/1000; 
 
 %% Functions
 % y1 = psi

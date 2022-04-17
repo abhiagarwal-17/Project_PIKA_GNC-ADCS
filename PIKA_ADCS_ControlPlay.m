@@ -1,5 +1,3 @@
-%% State Space Realizations
-
 %% Dynamical Modelling and State Space Realizations for the ADCS/GNC Subsystem 
 
 close all 
@@ -35,6 +33,7 @@ B1 = zeros(3,3);
 %state transformation required to apply control input on angle rather than
 %angular velocity
 An = [A11 A12; Ao A21];
+%An = [A11 A12; Ao -B];
 Bn = [B1; Bo];
 Cn = [ones(1,3) ones(1,3)];
 
@@ -81,7 +80,9 @@ for i = 1:6000
     if x(1:3,i) >= 0.00174533 | x(1:3,i) <= -0.00174533
         Kcl = K2;
     elseif x(1:3,i) <= (0.00174533)/2 & x(1:3,i) <= -(0.00174533)/2
-        Kcl = 0;
+        Kcl = zeros(3,6);
+    else
+        Kcl = zeros(3,6);
     end
     
     Anew = An - Bn*K2;
@@ -116,5 +117,3 @@ h = Tmean*4.734e+7;
 
 %Number of saturations in 1.5 years
 timesat = h/4;
-
-

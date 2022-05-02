@@ -74,10 +74,10 @@ TS = SRP(1.57/2,1.524,0,0,0,0); %spacecraft with r =1.57/2 m and h = 1.524 m and
 
 %TG = Grav(0,0,-1,1.57/2,1.524,600); %same dimensions as above and mass = 600 kg
 
-I = paxis(1.57/2,1.524,2*(1.524),(1/2)*1.524,600,20); %assuming the panels are 10 kg in weight, Lplate = 2hcyl, 
+I = paxis(1.57/2,1.524,2*(1.524),(1/2)*1.524,811,30); %assuming the panels are 10 kg in weight, Lplate = 2hcyl, 
 %hplate = 1/2hycl
 
-TG = pGrav(0,0,-1,1.57/2,1.524,600,I(1),I(2),I(3)); %new TG calc with parallel axis therorem
+TG = pGrav(0,0,-1,1.57/2,1.524,811,I(1),I(2),I(3)); % TG with parallel axis therorem
 
 Tc = Control(TG,0); %uses the primary disturbance torque in this example, which is gravity gradient torque
 
@@ -86,15 +86,6 @@ h = Moment(TG,0); %finds an estimate of the maximum reaction wheel saturation
 slw = Slew(180,500,300); %slew torque of 180 degrees around the maximum moment of inertia in 5 minutes (300 s)
 
 slwchng = slw*(300/2); %change in momentum due to slew torque in [Nms]
-
-%For thrusters:
-
-%pulse duration 0.025
-%1.1 Nm [max for 1 pulse]
-%assume 10 ms down time
-
-%Worst case scenario slew will likely require thrusters but some lesser
-%slews can be completed with RWs --> saves on propellant/fuel
 
 %% functions start here
 

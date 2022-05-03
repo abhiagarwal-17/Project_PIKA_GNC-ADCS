@@ -5,22 +5,22 @@ m_moon = 7.347e22; %kg
 R_moon = 1.737e6; %m
 G = 6.67e-11; %SI Units
 mu_moon = G * m_moon; 
-h_orbit = 50 * 1000; %m (altitude of circular orbit) 
+h_orbit = 100 * 1000; %m (altitude of circular orbit) 
 R_orbit = R_moon + h_orbit; 
 v_orbit = sqrt(mu_moon/R_orbit); 
 
-frequency = 27; % days
+frequency = 32.5; % days
 
 % SRP values
 % all planets plus asteroid tempelates
 % SRP: spherical with 0.0141 m^2/kg estimate of area/mass
 %% Calculation of orbital velocity change
 % parameters of orbit after 25 days 
-perigee = 45.98 * 1000 + R_moon; 
-apogee = 51.42 * 1000 + R_moon; 
+perigee = 96.5 * 1000 + R_moon; 
+apogee = 101.5 * 1000 + R_moon; 
 
-perigee = 30 * 1000 + R_moon; 
-apogee = 70 * 1000 + R_moon; 
+perigee = 111.12 * 1000 + R_moon; 
+apogee = 86.5 * 1000 + R_moon; 
 a = (apogee + perigee)/2; 
 
 v_perigee = sqrt(mu_moon * (2/perigee - 1/a)); 
@@ -70,7 +70,7 @@ impulse = T_total * t;
 
 num = 4/impulse; 
 
-annual_num = num * 1000; 
+annual_num = 4 * num * 228; 
 
 
 % for other directions
@@ -78,4 +78,4 @@ T_total_perp = 2 * 105 * (1.575/2);
 impulse_perp = T_total_perp * t; 
 num_perp = 4/impulse_perp; 
 
-annual_num_perp = num_perp * 1000; 
+annual_num_perp = 4 * num_perp * 228; 

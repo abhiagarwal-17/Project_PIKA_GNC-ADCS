@@ -9,13 +9,17 @@ Iz = 0.5 * mass * R^2;
 Ix = 0.25 * mass * R^2 + (1/12) * mass * H^2; 
 Iy = 0.25 * mass * R^2 + (1/12) * mass * H^2; 
 
+% Iz = 593.9; 
+% Ix = 283.4; 
+% Iy = 310.5; 
+
 Thr = 490; % N (thrust exerted by main thruster) 
 
 offset = deg2rad(0.3); % deg (angle by which the center of mass is offset)
 
 delta_theta = deg2rad(1); 
 
-total_time = 23.74 * 60; % seconds (total time of the burn)
+total_time = 12.74 * 60; % seconds (total time of the burn)
 %% Calculating initial estimate of spin velocity
 Thrz = Thr * cos(offset); 
 Thry = Thr * sin(offset); 
@@ -26,7 +30,7 @@ omega_z = (T_x  * total_time)/ (Iz * delta_theta);
 
 
 %% Differential Solver
-omega_z = 8.1; 
+omega_z = 8; 
 omega_0 = [0; 0; omega_z];
 time = linspace(0, total_time, 200);
 [t, w] = ode45(@vdp2, time, omega_0, [], Ix, Iy, Iz, T_x);
@@ -108,6 +112,7 @@ ylabel('\phi (deg)');
 
 
 %% Actuator Sizing
+omega_z = 5.5; 
 t = 0.02; %seconds
 
 T = 4 * 52 * sin(deg2rad(47.22)) * (1.575/2); 
@@ -127,6 +132,7 @@ I2 = Iy;
 I3 = Iz;
 dwdt = [(-1 * (I3 - I2) * w(2) * w(3) + T_x)/I1; (-1*(I1 - I3)*w(3)*w(1))/I2; 0];
 end
+
 function dydt = vdp3(t, y, omega)
 dydt = [omega(2) * (sin(y(3))/cos(y(2))) + omega(3) * (cos(y(3))/cos(y(2))); omega(2) * cos(y(3)) - omega(3) * sin(y(3)); omega(1) + omega(2) * (sin(y(3)) * tan(y(2))) + omega(3) * (cos(y(3)) * tan(y(2)))];
 end

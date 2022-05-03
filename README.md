@@ -8,3 +8,7 @@ Use `PIKA_Actuator.m` to solve coupled differential equations and find the Euler
 Use `PIKA_Stationkeeping.m` to estimate delta v values in low lunar orbit for stationkeeping. 
 
 Use `PIKA_ADCS_ControlPlay.m` to simulate open-loop (uncontrolled) and closed-loop (LQR) dynamical models for the on-orbit spacecraft.
+
+Use `PIKA_group_project_tli_controller.m` to simulate closed-loop response to perturbative torques during translunar injection.
+
+Use `PIKA_visual_generation.m` to generate the visuals used for the solar radiation pressure and gravitational gradient perturbative torque plots.
